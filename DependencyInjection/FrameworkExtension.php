@@ -712,11 +712,11 @@ class FrameworkExtension extends Extension
                 $taskAttributeClass,
                 static function (ChildDefinition $definition, AsPeriodicTask|AsCronTask $attribute, \ReflectionClass|\ReflectionMethod $reflector): void {
                     $tagAttributes = get_object_vars($attribute) + [
-                        'trigger' => match ($attribute::class) {
-                            AsPeriodicTask::class => 'every',
-                            AsCronTask::class => 'cron',
-                        },
-                    ];
+                            'trigger' => match ($attribute::class) {
+                                AsPeriodicTask::class => 'every',
+                                AsCronTask::class => 'cron',
+                            },
+                        ];
                     if ($reflector instanceof \ReflectionMethod) {
                         if (isset($tagAttributes['method'])) {
                             throw new LogicException(sprintf('"%s" attribute cannot declare a method on "%s::%s()".', $attribute::class, $reflector->class, $reflector->name));
@@ -807,9 +807,9 @@ class FrameworkExtension extends Extension
 
         if ($httpMethodOverride) {
             $container->getDefinition('http_cache')
-                  ->addArgument((new Definition('void'))
-                      ->setFactory([Request::class, 'enableHttpMethodParameterOverride'])
-                  );
+                ->addArgument((new Definition('void'))
+                    ->setFactory([Request::class, 'enableHttpMethodParameterOverride'])
+                );
         }
     }
 
@@ -1996,10 +1996,6 @@ class FrameworkExtension extends Extension
             $container->setParameter('serializer.default_context', $defaultContext);
         }
 
-        if (!$container->hasDefinition('serializer.normalizer.object')) {
-            return;
-        }
-
         $arguments = $container->getDefinition('serializer.normalizer.object')->getArguments();
         $context = [];
 
@@ -2292,7 +2288,8 @@ class FrameworkExtension extends Extension
                     ->replaceArgument(0, $transport['retry_strategy']['max_retries'])
                     ->replaceArgument(1, $transport['retry_strategy']['delay'])
                     ->replaceArgument(2, $transport['retry_strategy']['multiplier'])
-                    ->replaceArgument(3, $transport['retry_strategy']['max_delay']);
+                    ->replaceArgument(3, $transport['retry_strategy']['max_delay'])
+                    ->replaceArgument(4, $transport['retry_strategy']['retry_to_original_exchange']);
                 $container->setDefinition($retryServiceId, $retryDefinition);
 
                 $transportRetryReferences[$name] = new Reference($retryServiceId);
